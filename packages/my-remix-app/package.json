@@ -1,6 +1,6 @@
 {
   "name": "my-remix-app",
-  "private": true,
+  "private": false,
   "sideEffects": false,
   "type": "module",
   "version": "0.1.0",
