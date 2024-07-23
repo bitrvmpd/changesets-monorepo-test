@@ -1,5 +1,5 @@
 {
-  "name": "@bitrvmpd/monorepo",
+  "name": "@bitrvmpd/monorepo-changesets",
   "private": true,
   "devDependencies": {
     "@changesets/cli": "^2.27.7"
