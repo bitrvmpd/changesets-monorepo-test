@@ -1,5 +1,11 @@
 # my-remix-app
 
+## 0.1.2
+
+### Patch Changes
+
+- 855ba5b: Bumping patch, testing previews
+
 ## 0.1.1
 
 ### Patch Changes
