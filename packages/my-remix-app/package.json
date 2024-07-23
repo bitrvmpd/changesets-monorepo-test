@@ -1,6 +1,6 @@
 {
-  "name": "my-remix-app",
-  "private": true,
+  "name": "@bitrvmpd/my-remix-app",
+  "private": false,
   "sideEffects": false,
   "type": "module",
   "version": "0.1.0",
