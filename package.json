@@ -1,0 +1,12 @@
+{
+  "name": "@bitrvmpd/monorepo",
+  "private": true,
+  "devDependencies": {
+    "@changesets/cli": "^2.27.7"
+  },
+  "engines": {
+    "node": "20.15.1",
+    "pnpm": ">=9.5.0"
+  },
+  "packageManager": "pnpm@9.5.0"
+}
