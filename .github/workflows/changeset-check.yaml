@@ -28,3 +28,30 @@ jobs:
 
       - name: Check for Changesets
         run: pnpm changeset status --since=origin/main
+
+  preview:
+    needs: check
+    name: Changesets Preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+
+      - name: Enable Corepack
+        id: enable-corepack
+        run: corepack enable
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Preview Changesets
+        run: |
+          pnpm changeset version --snapshot preview-${{ github.event.pull_request.head.sha }}
+          pnpm changeset publish --no-git-tag --tag preview-${{ github.event.pull_request.head.sha }}
