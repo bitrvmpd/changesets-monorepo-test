@@ -51,7 +51,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Preview Changesets
+      - name: Generate Preview Version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pnpm changeset version --snapshot preview-${{ github.event.pull_request.head.sha }}
-          pnpm changeset publish --no-git-tag --tag preview-${{ github.event.pull_request.head.sha }}
+          pnpm config set '//npm.pkg.github.com/:_authToken' "${NODE_AUTH_TOKEN}"
+          npm_config_registry=https://npm.pkg.github.com pnpm changeset version --snapshot preview-${{ github.event.pull_request.head.sha }}
+          npm_config_registry=https://npm.pkg.github.com pnpm changeset publish --no-git-tag --tag preview-${{ github.event.pull_request.head.sha }}

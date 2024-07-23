@@ -1,5 +1,5 @@
 ---
-"my-remix-app": patch
+"@bitrvmpd/my-remix-app": patch
 ---
 
 Patch change
