@@ -9,7 +9,9 @@
     "pnpm": ">=9.5.0"
   },
   "scripts": {
-    "publish": "npm_config_registry=https://npm.pkg.github.com pnpm changeset publish"
+    "publish": "npm_config_registry=https://npm.pkg.github.com pnpm changeset publish",
+    "version-snapshot": "npm_config_registry=https://npm.pkg.github.com pnpm changeset version --snapshot",
+    "publish-snapshot": "npm_config_registry=https://npm.pkg.github.com pnpm changeset publish --no-git-tag --tag"
   },
   "packageManager": "pnpm@9.5.0"
 }
