@@ -1,5 +1,11 @@
 # my-remix-app
 
+## 0.1.3
+
+### Patch Changes
+
+- 95ffd2f: Force patch version update
+
 ## 0.1.2
 
 ### Patch Changes
