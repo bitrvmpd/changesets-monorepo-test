@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - main
+    types: [labeled]
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   preview:
