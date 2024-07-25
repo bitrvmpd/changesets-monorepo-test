@@ -1,14 +1,14 @@
-name: Changesets Check
+name: Publish Snapshot
+
 on:
   pull_request:
     branches:
       - main
     types: [labeled]
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  preview:
+  snapshot:
     if: contains(github.event.pull_request.labels.*.name, 'snapshot')
-    name: Changesets Preview
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -19,7 +19,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: packages/my-remix-app/package.json
+          node-version-file: package.json
+          registry-url: https://registry.npmjs.org
 
       - name: Enable Corepack
         id: enable-corepack
@@ -30,35 +31,38 @@ jobs:
 
       - uses: benjlevesque/short-sha@v3.0
         id: short-sha
-        
+
       - name: Check for Changesets
         id: check-changesets
         run: pnpm changeset status --since=origin/main
 
-      - name: Generate Preview Version
+      - name: Calculate Preview Version
+        id: preview-version
+        run: |
+          pnpm changeset version --snapshot preview-${{ steps.short-sha.outputs.sha }}
+          git diff --name-only --diff-filter=u | grep package.json | xargs -n 1 jq '. as $root | {name: ("`"+$root.name+"`"), version: ("`"+$root.version+"`"), registry: ("[NPM](https://www.npmjs.com/package/"+$root.name+"/v/"+$root.version+")")}' | jq -s -c > changesets.json
+          echo "publishedPackages=$(cat changesets.json)" >> $GITHUB_OUTPUT
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish Snapshot Version
         id: preview-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          pnpm config set '//npm.pkg.github.com/:_authToken' "${NODE_AUTH_TOKEN}"
-          npm_config_registry=https://npm.pkg.github.com pnpm changeset version --snapshot preview-${{ steps.short-sha.outputs.sha }}
-          git diff --name-only --diff-filter=u | grep package.json | xargs -n 1 jq '. as $root | {name: ("`"+$root.name+"`"), version: ("`"+$root.version+"`"), registry: ("[NPM](https://www.npmjs.com/package/"+$root.name+"/v/"+$root.version+")")}' | jq -s -c > changesets.json
-          npm_config_registry=https://npm.pkg.github.com pnpm changeset publish --no-git-tag --tag preview-${{ steps.short-sha.outputs.sha }}
-          pnpm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
-          npm_config_registry=https://registry.npmjs.org pnpm changeset publish --no-git-tag --tag preview-${{ steps.short-sha.outputs.sha }}
-          echo "publishedPackages=$(cat changesets.json)" >> $GITHUB_OUTPUT
-          echo "published=true" >> $GITHUB_OUTPUT
+          pnpm changeset publish --no-git-tag --tag preview-${{ steps.short-sha.outputs.sha }}
+
       - uses: buildingcash/json-to-markdown-table-action@v1
         id: table
         with:
-          json: ${{ steps.preview-release.outputs.publishedPackages }}
+          json: ${{ steps.preview-version.outputs.publishedPackages }}
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
             ### 📦️ Snapshot packages
+            Latest commit: ${{ github.sha }}
             ${{ steps.table.outputs.table }}
           comment_tag: execution
