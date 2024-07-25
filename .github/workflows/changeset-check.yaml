@@ -30,7 +30,7 @@ jobs:
         run: pnpm changeset status --since=origin/main
 
   preview:
-    needs: check
+    # needs: check
     name: Changesets Preview
     runs-on: ubuntu-latest
     steps:
